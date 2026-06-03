@@ -27,7 +27,7 @@ estado compartilhado.
 ├── tools/
 │   └── plot.py
 ├── images/
-│   └── speedup.png
+│   └── speedup_chart.png
 └── benchmark_results.csv
 ```
 
@@ -156,7 +156,7 @@ divergente.
 
 ### Grafico Speedup x Numero de Threads
 
-![Speedup vs Threads](images/speedup.png)
+![Speedup vs Threads](images/speedup_chart.png)
 
 ### Discussao
 

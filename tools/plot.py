@@ -164,7 +164,7 @@ def main():
 
     ax1.set_title(f"Escalabilidade — Multiplicacao de Matrizes {args.n}x{args.n}")
 
-    img_path = os.path.join(PROJECT_DIR, "images", "speedup.png")
+    img_path = os.path.join(PROJECT_DIR, "images", "speedup_chart.png")
     os.makedirs(os.path.dirname(img_path), exist_ok=True)
     plt.savefig(img_path, dpi=150, bbox_inches="tight")
     plt.close()
