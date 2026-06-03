@@ -111,7 +111,7 @@ A cronometragem usa `clock_gettime(CLOCK_MONOTONIC)` isolando apenas a regiao de
 
 O resultado e validado via checksum (soma de todos os elementos de C).
 
-**T_seq** (media de 5 medicoes, apos aquecimento, n=1200): **4.1517 s**
+**T_seq** (media de 5 medicoes, apos aquecimento, n=1200): **3.9597 s**
 (Matriz 1200x1200)
 
 ---
@@ -135,8 +135,8 @@ divergente.
 
 | Threads | Tempo (s) | Speedup  |
 |---------|-----------|----------|
-| 1 (seq) |    4.1517 |   1.000x |
-|      12 |    0.6255 |   6.638x |
+| 1 (seq) |    3.9597 |   1.000x |
+|      12 |    0.8742 |   4.529x |
 
 ---
 
@@ -146,13 +146,13 @@ divergente.
 
 | Threads | Tempo (s) | Speedup  | Eficiencia |
 |---------|-----------|----------|------------|
-| 1 (seq) |    4.1517 |   1.000x |     1.0000 |
-|       2 |    1.7433 |   2.382x |     1.1908 |
-|       4 |    1.1470 |   3.620x |     0.9049 |
-|       6 |    0.6785 |   6.119x |     1.0198 |
-|       8 |    0.5716 |   7.263x |     0.9079 |
-|      10 |    0.5528 |   7.511x |     0.7511 |
-|      12 |    0.6255 |   6.638x |     0.5531 |
+| 1 (seq) |    3.9597 |   1.000x |     1.0000 |
+|       2 |    1.7290 |   2.290x |     1.1451 |
+|       4 |    1.1776 |   3.363x |     0.8406 |
+|       6 |    0.7536 |   5.254x |     0.8757 |
+|       8 |    0.7116 |   5.565x |     0.6956 |
+|      10 |    0.8593 |   4.608x |     0.4608 |
+|      12 |    0.8742 |   4.529x |     0.3775 |
 
 ### Grafico Speedup x Numero de Threads
 
@@ -162,18 +162,18 @@ divergente.
 
 O speedup nao e linear por varios fatores. Primeiro, a **Lei de Amdahl** se aplica:
 a criacao e juncao das threads (pthread_create/pthread_join) constitui uma parcela
-sequencial que limita o speedup maximo, especialmente visivel ao passar de 10 para
-12 threads onde o tempo piora. Segundo, o **overhead de criacao/destruicao de
-threads** se torna proporcionalmente maior conforme o trabalho por thread diminui,
-reduzindo a eficiencia de 1.0 em T=1 para 0.55 em T=12. Terceiro, ha efeito de
-**superlinearidade em T=2 e T=6** (speedup maior que o numero de threads): isso
-ocorre porque, com menos linhas por thread, o conjunto de trabalho cabe melhor nos
-caches L2/L3 da CPU, reduzindo cache-misses — um fenomeno bem documentado em
+sequencial que limita o speedup maximo, especialmente visivel ao passar de 8 para
+10 threads onde o tempo piora (de 0.71s para 0.86s). Segundo, o **overhead de
+criacao/destruicao de threads** se torna proporcionalmente maior conforme o trabalho
+por thread diminui, reduzindo a eficiencia de 1.0 em T=1 para 0.38 em T=12.
+Terceiro, ha efeito de **superlinearidade em T=2** (speedup 2.29x > 2.0 threads):
+isso ocorre porque, com menos linhas por thread, o conjunto de trabalho cabe melhor
+nos caches L2/L3 da CPU, reduzindo cache-misses — um fenomeno bem documentado em
 cargas CPU-bound como multiplicacao de matrizes. Quarto, a **arquitetura hibrida**
 do i7-1255U (2 P-cores + 8 E-cores) explica por que o pico de desempenho ocorre
-em T=8~10: os P-cores tem maior frequencia e IPC, e apos T=10 o scheduler distribui
+em T=8: os P-cores tem maior frequencia e IPC, e apos T=8 o scheduler distribui
 trabalho para nucleos de eficiencia mais lentos, piorando o balanceamento de carga
-e reduzindo o speedup em T=12.
+e reduzindo o speedup em T=10 e T=12.
 
 ---
 
