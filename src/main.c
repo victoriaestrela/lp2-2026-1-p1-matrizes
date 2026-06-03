@@ -50,12 +50,12 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Uso: %s <n> <num_threads> [num_runs]\n\n", argv[0]);
         fprintf(stderr, "  n           : tamanho da matriz n x n (ex: 1200)\n");
         fprintf(stderr, "  num_threads : numero de threads (ex: 4)\n");
-        fprintf(stderr, "  num_runs    : total de repeticoes (padrao: 1, apenas verificacao)\n");
-        fprintf(stderr, "                use >= 5: a primeira execucao e aquecimento (descartada),\n");
-        fprintf(stderr, "                as demais sao medidas e calcula-se a media\n\n");
+        fprintf(stderr, "  num_runs    : repeticoes cronometradas (padrao: 1)\n");
+        fprintf(stderr, "                use >= 5 para media confiavel (um aquecimento\n");
+        fprintf(stderr, "                extra e executado antes, fora da contagem)\n\n");
         fprintf(stderr, "Exemplos:\n");
         fprintf(stderr, "  %s 1200 4              # verifica corretude\n", argv[0]);
-        fprintf(stderr, "  %s 1200 4 6            # 1 aquecimento + 5 medicoes = media de 5\n", argv[0]);
+        fprintf(stderr, "  %s 1200 4 5            # 5 medicoes (+ 1 aquecimento)\n", argv[0]);
         return 1;
     }
 
@@ -104,15 +104,14 @@ int main(int argc, char *argv[]) {
     }
 
     /* --- BENCHMARK --- */
-    if (num_runs <= 1) {
+    if (num_runs <= 0) {
         free(a); free(b); free(c_seq); free(c_par);
         return 0;
     }
 
-    int num_measured = num_runs - 1;
     struct timespec t0, t1;
-    double *seq_times = malloc((size_t)num_measured * sizeof(double));
-    double *par_times = malloc((size_t)num_measured * sizeof(double));
+    double *seq_times = malloc((size_t)num_runs * sizeof(double));
+    double *par_times = malloc((size_t)num_runs * sizeof(double));
 
     if (!seq_times || !par_times) {
         fprintf(stderr, "Erro: falha ao alocar arrays de tempo.\n");
@@ -121,15 +120,18 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("\n=== BENCHMARK (%d repeticoes: 1 aquecimento + %d medicoes) ===\n\n",
-           num_runs, num_measured);
+    if (num_runs >= 5) {
+        printf("\n=== BENCHMARK (%d medicoes + 1 aquecimento) ===\n\n", num_runs);
+    } else {
+        printf("\n=== MEDICAO UNICA (%d repeticoes) ===\n\n", num_runs);
+    }
 
-    /* aquecimento: primeira execucao (resultado descartado) */
+    /* aquecimento: executa ambas as versoes uma vez (resultado descartado) */
     multiply_seq(a, b, c_seq, n);
     multiply_par(a, b, c_par, n, num_threads);
 
     /* repeticoes cronometradas da versao sequencial */
-    for (int r = 0; r < num_measured; r++) {
+    for (int r = 0; r < num_runs; r++) {
         clock_gettime(CLOCK_MONOTONIC, &t0);
         multiply_seq(a, b, c_seq, n);
         clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -137,7 +139,7 @@ int main(int argc, char *argv[]) {
     }
 
     /* repeticoes cronometradas da versao paralela */
-    for (int r = 0; r < num_measured; r++) {
+    for (int r = 0; r < num_runs; r++) {
         clock_gettime(CLOCK_MONOTONIC, &t0);
         multiply_par(a, b, c_par, n, num_threads);
         clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -146,16 +148,16 @@ int main(int argc, char *argv[]) {
 
     /* calcula medias */
     double seq_sum = 0.0, par_sum = 0.0;
-    for (int r = 0; r < num_measured; r++) {
+    for (int r = 0; r < num_runs; r++) {
         seq_sum += seq_times[r];
         par_sum += par_times[r];
     }
-    double seq_avg = seq_sum / num_measured;
-    double par_avg = par_sum / num_measured;
+    double seq_avg = seq_sum / num_runs;
+    double par_avg = par_sum / num_runs;
     double speedup = (par_avg > 0.0) ? seq_avg / par_avg : 0.0;
     double efficiency = speedup / num_threads;
 
-    printf("Medias (%d execucoes, apos aquecimento):\n", num_measured);
+    printf("Medias (%d execucoes):\n", num_runs);
     printf("  T_seq      = %.6f s\n", seq_avg);
     printf("  T_par (%2dT) = %.6f s\n", num_threads, par_avg);
     printf("  Speedup    = %.4fx\n", speedup);
@@ -163,10 +165,10 @@ int main(int argc, char *argv[]) {
 
     /* exibe repeticoes individuais */
     printf("Repeticoes sequenciais (s):");
-    for (int r = 0; r < num_measured; r++) printf(" %.4f", seq_times[r]);
+    for (int r = 0; r < num_runs; r++) printf(" %.4f", seq_times[r]);
 
     printf("\nRepeticoes paralelas   (s):");
-    for (int r = 0; r < num_measured; r++) printf(" %.4f", par_times[r]);
+    for (int r = 0; r < num_runs; r++) printf(" %.4f", par_times[r]);
     printf("\n");
 
     free(seq_times);

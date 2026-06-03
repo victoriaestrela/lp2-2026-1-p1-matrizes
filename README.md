@@ -71,19 +71,19 @@ gcc -O2 -Wall -Wextra -std=c11 -pthread src/main.c src/matrix_multiply.c -o matr
 # Apenas verificacao de corretude
 ./matrix_multiply 1200 4
 
-# Benchmark: 7 repeticoes (1 aquecimento + 6 uteis)
-./matrix_multiply 1200 4 7
+# Benchmark: 5 medicoes (+ 1 aquecimento automatico)
+./matrix_multiply 1200 4 5
 
 # Variar numero de threads
-./matrix_multiply 1200 1 7
-./matrix_multiply 1200 2 7
-./matrix_multiply 1200 8 7
+./matrix_multiply 1200 1 5
+./matrix_multiply 1200 2 5
+./matrix_multiply 1200 8 5
 ```
 
 ### Sweep completo (Q4)
 
 ```bash
-python3 tools/plot.py --n 1200 --runs 6 --threads 1,2,4,6,8,10,12
+python3 tools/plot.py --n 1200 --runs 5 --threads 1,2,4,6,8,10,12
 ```
 
 ---
@@ -110,7 +110,7 @@ A cronometragem usa `clock_gettime(CLOCK_MONOTONIC)` isolando apenas a regiao de
 
 O resultado e validado via checksum (soma de todos os elementos de C).
 
-**T_seq** (media de 7 execucoes, a primeira descartada como aquecimento): **4.1517 s**
+**T_seq** (media de 5 medicoes, apos aquecimento, n=1200): **4.1517 s**
 (Matriz 1200x1200)
 
 ---
@@ -230,19 +230,19 @@ $ for t in 1 2 4 8 12; do ./matrix_multiply 1200 $t 1 | grep VERIFICACAO; done
 
 ### Teste 4 — Sanidade (T=1)
 ```bash
-$ ./matrix_multiply 1200 1 7
+$ ./matrix_multiply 1200 1 5
 # Speedup ≈ 1.0 (pequeno overhead de criacao de thread)
 ```
 
 ### Teste 5 — Estabilidade
 ```bash
-$ ./matrix_multiply 1200 4 7
+$ ./matrix_multiply 1200 4 5
 # Baixa variancia entre as repeticoes
 ```
 
 ### Teste 6 — Speedup esperado
 ```bash
-$ ./matrix_multiply 1200 4 7
+$ ./matrix_multiply 1200 4 5
 # Tempo cai claramente de T=1 para T=2/4 (speedup > 1)
 ```
 

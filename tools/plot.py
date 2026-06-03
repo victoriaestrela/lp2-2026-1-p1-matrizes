@@ -62,8 +62,8 @@ def main():
     parser = argparse.ArgumentParser(description="Sweep de escalabilidade para Q4")
     parser.add_argument("--n", type=int, default=1200,
                         help="Tamanho da matriz n x n (default: 1200)")
-    parser.add_argument("--runs", type=int, default=6,
-                        help="Repeticoes totais por ponto (default: 6; 1 aquecimento + 5 medicoes)")
+    parser.add_argument("--runs", type=int, default=5,
+                        help="Repeticoes cronometradas por ponto (default: 5)")
     parser.add_argument("--threads", type=str, default="1,2,4,6,8,10,12",
                         help="Lista de threads separada por virgula (default: 1,2,4,6,8,10,12)")
     args = parser.parse_args()

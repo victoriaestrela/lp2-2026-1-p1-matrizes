@@ -21,4 +21,4 @@ clean:
 	rm -rf build/
 
 run: $(TARGET)
-	./$(TARGET) 1200 4 6
+	./$(TARGET) 1200 4 5
