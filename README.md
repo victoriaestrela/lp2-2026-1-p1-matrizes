@@ -83,7 +83,7 @@ gcc -O2 -Wall -Wextra -std=c11 -pthread src/main.c src/matrix_multiply.c -o matr
 ### Sweep completo (Q4)
 
 ```bash
-python3 tools/plot.py --n 1200 --runs 7 --threads 1,2,4,6,8,10,12
+python3 tools/plot.py --n 1200 --runs 6 --threads 1,2,4,6,8,10,12
 ```
 
 ---
