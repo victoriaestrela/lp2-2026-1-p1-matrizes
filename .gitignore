@@ -1,0 +1,9 @@
+build/
+build-tsan/
+*.o
+matrix_multiply
+matrix_multiply_tsan
+__pycache__/
+*.pyc
+/tmp/
+LPII-2026-1-Trabalho-Pratico-1.pdf
