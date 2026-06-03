@@ -63,7 +63,8 @@ gcc -O2 -Wall -Wextra -std=c11 -pthread src/main.c src/matrix_multiply.c -o matr
 **Parametros:**
 - `n`: tamanho da matriz (n x n). Sugestao: 1000 a 1500.
 - `num_threads`: numero de threads (parametrizavel). Use o numero de nucleos da maquina.
-- `num_runs` (opcional): repeticoes para benchmark. Use >= 5 para medir tempo medio (a primeira execucao e descartada como aquecimento).
+- `num_runs` (opcional): repeticoes cronometradas. Use >= 5 para media confiavel
+  (um aquecimento extra e sempre executado antes, fora da contagem).
 
 **Exemplos:**
 
